@@ -38,10 +38,17 @@ public class ItemFluidDrop extends Item {
 
     @Override
     public void fillItemGroup(@Nonnull ItemGroup tab, @Nonnull NonNullList<ItemStack> items) {
+        // HIDE from creative menu and terminal
         if (isInGroup(tab)) {
             items.add(newStack(new FluidStack(Fluids.WATER, 1)));
             items.add(newStack(new FluidStack(Fluids.LAVA, 1)));
         }
+    }
+    
+    // Hide from terminal — keep crafting working!
+    @Override
+    public boolean isInGroup(@Nullable ItemGroup group) {
+        return false;
     }
 
     @Override
@@ -137,10 +144,4 @@ public class ItemFluidDrop extends Item {
         return stack;
     }
 
-}
-
-    // Hide from creative menu & terminal
-    @Override
-    public boolean isInCreativeTab(CreativeModeTab tab) {
-        return false;
 }
