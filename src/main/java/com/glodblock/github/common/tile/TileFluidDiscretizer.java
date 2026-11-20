@@ -9,8 +9,6 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.*;
-import appeng.api.storage.cells.ICellContainer;
-import appeng.api.storage.cells.ICellInventory;
 import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
@@ -67,7 +65,7 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
     @Override
     public void saveChanges(@Nullable ICellInventory<?> cellInventory) {
         if (world != null) {
-            world.markChunkDirty(pos, this);// optimization, i guess?
+            world.markChunkDirty(pos, this);
         }
     }
 
@@ -173,28 +171,13 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
             }
             IEnergyGrid energyGrid = getEnergyGrid();
             if (energyGrid == null) {
-                return input;
+                return null;
             }
             return ItemFluidDrop.newAeStack(fluidGrid.injectItems(fluidStack, type, ownActionSource));
         }
 
         @Override
         public IItemList<IAEItemStack> getAvailableItems(IItemList<IAEItemStack> out) {
-            if (itemCache == null) {
-                itemCache = new ObjectArrayList<>();
-                IMEMonitor<IAEFluidStack> fluidGrid = getFluidGrid();
-                if (fluidGrid != null) {
-                    for (IAEFluidStack fluid : fluidGrid.getStorageList()) {
-                        IAEItemStack stack = ItemFluidDrop.newAeStack(fluid);
-                        if (stack != null) {
-                            itemCache.add(stack);
-                        }
-                    }
-                }
-            }
-            for (IAEItemStack stack : itemCache) {
-                out.addStorage(stack);
-            }
             return out;
         }
 
