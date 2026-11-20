@@ -9,6 +9,8 @@ import appeng.api.networking.security.IActionSource;
 import appeng.api.networking.storage.IBaseMonitor;
 import appeng.api.networking.storage.IStorageGrid;
 import appeng.api.storage.*;
+import appeng.api.storage.cells.ICellContainer;
+import appeng.api.storage.cells.ICellInventory;
 import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
@@ -196,11 +198,11 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
                     boolean isNg = false;
                     if (fluidStack.getStackSize() < 0) {
                         isNg = true;
-                        fluidStack.setStackSize( - fluidStack.getStackSize() );
+                        fluidStack.setStackSize(-fluidStack.getStackSize());
                     }
                     IAEItemStack itemStack = ItemFluidDrop.newAeStack(fluidStack);
                     if (itemStack != null) {
-                        if (isNg) itemStack.setStackSize( - itemStack.getStackSize() );
+                        if (isNg) itemStack.setStackSize(-itemStack.getStackSize());
                         mappedChanges.add(itemStack);
                     }
                 }
@@ -241,7 +243,7 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
                 return null;
             }
             if (craftingGrid instanceof CraftingGridCache) {
-                IAEItemStack remaining = ((CraftingGridCache)craftingGrid).injectItems(
+                IAEItemStack remaining = ((CraftingGridCache) craftingGrid).injectItems(
                         ItemFluidDrop.newAeStack(input), type, ownActionSource);
                 if (remaining != null) {
                     return ItemFluidDrop.getAeFluidStack(remaining);
