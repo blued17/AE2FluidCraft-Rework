@@ -24,7 +24,7 @@ public class FluidDropItem extends AEBaseItem {
         super(new Item.Properties().stacksTo(1));
     }
 
-    // ✅ HIDE FROM CREATIVE MENU & TERMINAL - KEEPS CRAFTING WORKING!
+        // Hide fluid drops from terminal
     @Override
     public boolean isInCreativeTab(CreativeModeTab tab) {
         return false;
