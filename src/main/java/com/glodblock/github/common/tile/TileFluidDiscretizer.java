@@ -133,8 +133,6 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
     private class FluidDiscretizingInventory implements IMEInventory<IAEItemStack>, IMEMonitorHandlerReceiver<IAEFluidStack> {
 
         private final MEInventoryHandler<IAEItemStack> invHandler = new MEInventoryHandler<>(this, getChannel());
-        @Nullable
-        private ObjectArrayList<IAEItemStack> itemCache = null;
 
         FluidDiscretizingInventory() {
             invHandler.setPriority(Integer.MAX_VALUE);
@@ -156,6 +154,7 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
             if (energyGrid == null) {
                 return null;
             }
+            // ✅ ALLOW extraction — this is what crafting needs!
             return ItemFluidDrop.newAeStack(fluidGrid.extractItems(fluidStack, mode, ownActionSource));
         }
 
@@ -180,6 +179,7 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
 
         @Override
         public IItemList<IAEItemStack> getAvailableItems(IItemList<IAEItemStack> out) {
+            // ✅ Return EMPTY — fluid drops NEVER show in terminal item list
             return out;
         }
 
@@ -191,26 +191,8 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
 
         @Override
         public void postChange(IBaseMonitor<IAEFluidStack> monitor, Iterable<IAEFluidStack> change, IActionSource actionSource) {
-            itemCache = null;
-            try {
-                ObjectArrayList<IAEItemStack> mappedChanges = new ObjectArrayList<>();
-                for (IAEFluidStack fluidStack : change) {
-                    boolean isNg = false;
-                    if (fluidStack.getStackSize() < 0) {
-                        isNg = true;
-                        fluidStack.setStackSize(-fluidStack.getStackSize());
-                    }
-                    IAEItemStack itemStack = ItemFluidDrop.newAeStack(fluidStack);
-                    if (itemStack != null) {
-                        if (isNg) itemStack.setStackSize(-itemStack.getStackSize());
-                        mappedChanges.add(itemStack);
-                    }
-                }
-                getProxy().getGrid().<IStorageGrid>getCache(IStorageGrid.class)
-                        .postAlterationOfStoredItems(getChannel(), mappedChanges, ownActionSource);
-            } catch (GridAccessException e) {
-                // NO-OP
-            }
+            // ✅ DO NOT broadcast fluid drops to item storage network
+            // This keeps them out of the terminal but extract/inject still work for crafting!
         }
 
         @Override
@@ -222,7 +204,6 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
         public IStorageChannel<IAEItemStack> getChannel() {
             return FCUtil.ITEM;
         }
-
     }
 
     private class FluidCraftingInventory implements IMEInventory<IAEFluidStack> {
@@ -267,7 +248,5 @@ public class TileFluidDiscretizer extends AENetworkTileEntity implements ICellCo
         public IStorageChannel<IAEFluidStack> getChannel() {
             return FCUtil.FLUID;
         }
-
     }
-
 }
